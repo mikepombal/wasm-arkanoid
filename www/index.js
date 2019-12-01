@@ -7,7 +7,7 @@ const ALIVE_COLOR = "#000000";
 
 const BACKGROUND_COLOUR = "#FFFFFF";
 const BORDER_COLOUR = "#333333";
-const PAD_COLOUR = "#333333";
+const MAIN_COLOUR = "#333333";
 
 // Construct the universe, and get its width and height.
 const universe = Universe.new();
@@ -66,9 +66,19 @@ const drawPad = () => {
   const padPosition = universe.pad_position();
 
   ctx.beginPath();
-  ctx.fillStyle = PAD_COLOUR;
+  ctx.fillStyle = MAIN_COLOUR;
   ctx.fillRect(padPosition - 50, height - 50, 100, 20);
   ctx.stroke();
+};
+
+const drawBall = () => {
+  const xPosition = universe.ball_x_position();
+  const yPosition = universe.ball_y_position();
+
+  ctx.beginPath();
+  ctx.fillStyle = MAIN_COLOUR;
+  ctx.arc(xPosition, yPosition, 10, 0, Math.PI * 2, true);
+  ctx.fill();
 };
 
 const drawCells = () => {
@@ -104,6 +114,7 @@ const isPaused = () => {
 const renderLoop = () => {
   clearPanel();
   drawPad();
+  drawBall();
   // drawCells();
 
   universe.tick();

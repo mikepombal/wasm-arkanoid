@@ -24,6 +24,7 @@ pub struct Universe {
     height: u32,
     cells: Vec<Cell>,
     pad: Pad,
+    ball: Ball
 }
 
 #[wasm_bindgen]
@@ -98,11 +99,14 @@ impl Universe {
 
         let pad = Pad { x: width / 2 };
 
+        let ball = Ball { x: width / 2, y: height / 2 };
+
         Universe {
             width,
             height,
             cells,
             pad,
+            ball,
         }
     }
 
@@ -138,6 +142,15 @@ impl Universe {
         let idx = self.get_index(row, column);
         self.cells[idx].toggle();
     }
+
+    pub fn ball_x_position(&self) -> u32 {
+        self.ball.x_position()
+    }
+
+    pub fn ball_y_position(&self) -> u32 {
+        self.ball.y_position()
+    }
+
 }
 
 impl Cell {
@@ -167,3 +180,18 @@ impl Pad {
     }
 }
 
+struct Ball {
+    x: u32,
+    y: u32
+}
+
+impl Ball {
+    fn x_position(&self) -> u32 {
+        self.x
+    }
+
+    fn y_position(&self) -> u32 {
+        self.y
+    }
+
+}
