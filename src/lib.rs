@@ -23,67 +23,68 @@ pub struct Universe {
     width: u32,
     height: u32,
     cells: Vec<Cell>,
+    pad: Pad,
 }
 
 #[wasm_bindgen]
 impl Universe {
     pub fn tick(&mut self) {
-        let mut next = self.cells.clone();
+        // let mut next = self.cells.clone();
 
-        for row in 0..self.height {
-            for col in 0..self.width {
-                let idx = self.get_index(row, col);
-                let cell = self.cells[idx];
-                let live_neighbors = self.live_neighbor_count(row, col);
+        // for row in 0..self.height {
+        //     for col in 0..self.width {
+        //         let idx = self.get_index(row, col);
+        //         let cell = self.cells[idx];
+        //         let live_neighbors = self.live_neighbor_count(row, col);
 
-                let next_cell = match (cell, live_neighbors) {
-                    // Rule 1: Any live cell with fewer than two live neighbours
-                    // dies, as if caused by underpopulation.
-                    (Cell::Alive, x) if x < 2 => Cell::Dead,
-                    // Rule 2: Any live cell with two or three live neighbours
-                    // lives on to the next generation.
-                    (Cell::Alive, 2) | (Cell::Alive, 3) => Cell::Alive,
-                    // Rule 3: Any live cell with more than three live
-                    // neighbours dies, as if by overpopulation.
-                    (Cell::Alive, x) if x > 3 => Cell::Dead,
-                    // Rule 4: Any dead cell with exactly three live neighbours
-                    // becomes a live cell, as if by reproduction.
-                    (Cell::Dead, 3) => Cell::Alive,
-                    // All other cells remain in the same state.
-                    (otherwise, _) => otherwise,
-                };
+        //         let next_cell = match (cell, live_neighbors) {
+        //             // Rule 1: Any live cell with fewer than two live neighbours
+        //             // dies, as if caused by underpopulation.
+        //             (Cell::Alive, x) if x < 2 => Cell::Dead,
+        //             // Rule 2: Any live cell with two or three live neighbours
+        //             // lives on to the next generation.
+        //             (Cell::Alive, 2) | (Cell::Alive, 3) => Cell::Alive,
+        //             // Rule 3: Any live cell with more than three live
+        //             // neighbours dies, as if by overpopulation.
+        //             (Cell::Alive, x) if x > 3 => Cell::Dead,
+        //             // Rule 4: Any dead cell with exactly three live neighbours
+        //             // becomes a live cell, as if by reproduction.
+        //             (Cell::Dead, 3) => Cell::Alive,
+        //             // All other cells remain in the same state.
+        //             (otherwise, _) => otherwise,
+        //         };
 
-                next[idx] = next_cell;
-            }
-        }
+        //         next[idx] = next_cell;
+        //     }
+        // }
 
-        self.cells = next;
+        // self.cells = next;
     }
 
     fn get_index(&self, row: u32, column: u32) -> usize {
         (row * self.width + column) as usize
     }
 
-    fn live_neighbor_count(&self, row: u32, column: u32) -> u8 {
-        let mut count = 0;
-        for delta_row in [self.height - 1, 0, 1].iter().cloned() {
-            for delta_col in [self.width - 1, 0, 1].iter().cloned() {
-                if delta_row == 0 && delta_col == 0 {
-                    continue;
-                }
+    // fn live_neighbor_count(&self, row: u32, column: u32) -> u8 {
+    //     let mut count = 0;
+    //     for delta_row in [self.height - 1, 0, 1].iter().cloned() {
+    //         for delta_col in [self.width - 1, 0, 1].iter().cloned() {
+    //             if delta_row == 0 && delta_col == 0 {
+    //                 continue;
+    //             }
 
-                let neighbor_row = (row + delta_row) % self.height;
-                let neighbor_col = (column + delta_col) % self.width;
-                let idx = self.get_index(neighbor_row, neighbor_col);
-                count += self.cells[idx] as u8;
-            }
-        }
-        count
-    }
+    //             let neighbor_row = (row + delta_row) % self.height;
+    //             let neighbor_col = (column + delta_col) % self.width;
+    //             let idx = self.get_index(neighbor_row, neighbor_col);
+    //             count += self.cells[idx] as u8;
+    //         }
+    //     }
+    //     count
+    // }
 
     pub fn new() -> Universe {
-        let width = 1256;
-        let height = 128;
+        let width = 700;
+        let height = 800;
 
         let cells = (0..width * height)
             .map(|_i| {
@@ -95,16 +96,19 @@ impl Universe {
             })
             .collect();
 
+        let pad = Pad { x: width / 2 };
+
         Universe {
             width,
             height,
             cells,
+            pad,
         }
     }
 
-    pub fn render(&self) -> String {
-        self.to_string()
-    }
+    // pub fn render(&self) -> String {
+    //     self.to_string()
+    // }
 
     pub fn width(&self) -> u32 {
         self.width
@@ -112,6 +116,18 @@ impl Universe {
 
     pub fn height(&self) -> u32 {
         self.height
+    }
+
+    pub fn pad_position(&self) -> u32 {
+        self.pad.position()
+    }
+
+    pub fn move_pad(&mut self, right: bool) {
+        if right {
+            self.pad.move_right()
+        } else {
+            self.pad.move_left()
+        }
     }
 
     pub fn cells(&self) -> *const Cell {
@@ -133,18 +149,21 @@ impl Cell {
     }
 }
 
-use std::fmt;
+struct Pad {
+    x: u32
+}
 
-impl fmt::Display for Universe {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        for line in self.cells.as_slice().chunks(self.width as usize) {
-            for &cell in line {
-                let symbol = if cell == Cell::Dead { '◻' } else { '◼' };
-                write!(f, "{}", symbol)?;
-            }
-            write!(f, "\n")?;
-        }
+impl Pad {
+    fn position(&self) -> u32 {
+        self.x
+    }
 
-        Ok(())
+    fn move_left(&mut self) {
+        self.x = self.x - 30
+    }
+
+    fn move_right(&mut self) {
+        self.x = self.x + 30
     }
 }
+

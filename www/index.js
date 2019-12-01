@@ -1,10 +1,13 @@
 import { Universe, Cell } from "wasm";
 import { memory } from "wasm/wasm_bg";
 
-const CELL_SIZE = 5; // px
 const GRID_COLOR = "#CCCCCC";
 const DEAD_COLOR = "#FFFFFF";
 const ALIVE_COLOR = "#000000";
+
+const BACKGROUND_COLOUR = "#FFFFFF";
+const BORDER_COLOUR = "#333333";
+const PAD_COLOUR = "#333333";
 
 // Construct the universe, and get its width and height.
 const universe = Universe.new();
@@ -14,51 +17,58 @@ const height = universe.height();
 // Give the canvas room for all of our cells and a 1px border
 // around each of them.
 const canvas = document.getElementById("game");
-canvas.height = (CELL_SIZE + 1) * height + 1;
-canvas.width = (CELL_SIZE + 1) * width + 1;
+canvas.height = height;
+canvas.width = width;
 
-canvas.addEventListener("click", event => {
-  const boundingRect = canvas.getBoundingClientRect();
+// canvas.addEventListener("click", event => {
+//   const boundingRect = canvas.getBoundingClientRect();
 
-  const scaleX = canvas.width / boundingRect.width;
-  const scaleY = canvas.height / boundingRect.height;
+//   const scaleX = canvas.width / boundingRect.width;
+//   const scaleY = canvas.height / boundingRect.height;
 
-  const canvasLeft = (event.clientX - boundingRect.left) * scaleX;
-  const canvasTop = (event.clientY - boundingRect.top) * scaleY;
+//   const canvasLeft = (event.clientX - boundingRect.left) * scaleX;
+//   const canvasTop = (event.clientY - boundingRect.top) * scaleY;
 
-  const row = Math.min(Math.floor(canvasTop / (CELL_SIZE + 1)), height - 1);
-  const col = Math.min(Math.floor(canvasLeft / (CELL_SIZE + 1)), width - 1);
+//   const row = Math.min(Math.floor(canvasTop / (CELL_SIZE + 1)), height - 1);
+//   const col = Math.min(Math.floor(canvasLeft / (CELL_SIZE + 1)), width - 1);
 
-  universe.toggle_cell(row, col);
+//   universe.toggle_cell(row, col);
 
-  drawGrid();
-  drawCells();
-});
+//   // drawCells();
+// });
+
+document.addEventListener(
+  "keypress",
+  event => {
+    if (event.key === "h") {
+      universe.move_pad(false);
+    } else if (event.key === "l") {
+      universe.move_pad(true);
+    }
+  },
+  false
+);
 
 const ctx = canvas.getContext("2d");
 
-const drawGrid = () => {
-  ctx.beginPath();
-  ctx.strokeStyle = GRID_COLOR;
-
-  // Vertical lines.
-  for (let i = 0; i <= width; i++) {
-    ctx.moveTo(i * (CELL_SIZE + 1) + 1, 0);
-    ctx.lineTo(i * (CELL_SIZE + 1) + 1, (CELL_SIZE + 1) * height + 1);
-  }
-
-  // Horizontal lines.
-  for (let j = 0; j <= height; j++) {
-    ctx.moveTo(0, j * (CELL_SIZE + 1) + 1);
-    ctx.lineTo((CELL_SIZE + 1) * width + 1, j * (CELL_SIZE + 1) + 1);
-  }
-
-  ctx.stroke();
-};
-console;
-
 const getIndex = (row, column) => {
   return row * width + column;
+};
+
+const clearPanel = () => {
+  ctx.beginPath();
+  ctx.fillStyle = BACKGROUND_COLOUR;
+  ctx.fillRect(0, 0, width, height);
+  ctx.stroke();
+};
+
+const drawPad = () => {
+  const padPosition = universe.pad_position();
+
+  ctx.beginPath();
+  ctx.fillStyle = PAD_COLOUR;
+  ctx.fillRect(padPosition - 50, height - 50, 100, 20);
+  ctx.stroke();
 };
 
 const drawCells = () => {
@@ -92,8 +102,9 @@ const isPaused = () => {
 };
 
 const renderLoop = () => {
-  drawGrid();
-  drawCells();
+  clearPanel();
+  drawPad();
+  // drawCells();
 
   universe.tick();
 
