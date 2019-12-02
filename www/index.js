@@ -1,5 +1,5 @@
 import { Universe, Cell } from "wasm";
-import { memory } from "wasm/wasm_bg";
+import { memory, universe_pad_height } from "wasm/wasm_bg";
 
 const GRID_COLOR = "#CCCCCC";
 const DEAD_COLOR = "#FFFFFF";
@@ -63,11 +63,14 @@ const clearPanel = () => {
 };
 
 const drawPad = () => {
-  const padPosition = universe.pad_position();
+  const top = universe.pad_top_position();
+  const left = universe.pad_left_position();
+  const height = universe.pad_height();
+  const width = universe.pad_width();
 
   ctx.beginPath();
   ctx.fillStyle = MAIN_COLOUR;
-  ctx.fillRect(padPosition - 50, height - 50, 100, 20);
+  ctx.fillRect(left, top, width, height);
   ctx.stroke();
 };
 

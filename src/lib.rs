@@ -11,6 +11,8 @@ static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 const WIDTH: u32 = 700;
 const HEIGHT: u32 = 800;
 const BALL_RADIUS: u32 = 10;
+const PAD_WIDTH: u32 = 100;
+const PAD_HEIGHT: u32 = 20;
 
 extern crate js_sys;
 
@@ -91,7 +93,7 @@ impl Universe {
         let width = WIDTH;
         let height = HEIGHT;
 
-        let cells = (0..width * height)
+        let cells = (0..WIDTH * HEIGHT)
             .map(|_i| {
                 if js_sys::Math::random() < 0.5 {
                     Cell::Alive
@@ -101,12 +103,15 @@ impl Universe {
             })
             .collect();
 
-        let pad = Pad { x: width / 2 };
+        let pad = Pad {
+            left: WIDTH / 2 - PAD_WIDTH / 2,
+            top: HEIGHT - 2 * PAD_HEIGHT,
+        };
 
         let ball = Ball {
             radius: BALL_RADIUS,
-            x: width / 2,
-            y: height / 2,
+            x: WIDTH / 2,
+            y: HEIGHT / 2,
         };
 
         Universe {
@@ -126,8 +131,20 @@ impl Universe {
         self.height
     }
 
-    pub fn pad_position(&self) -> u32 {
-        self.pad.position()
+    pub fn pad_top_position(&self) -> u32 {
+        self.pad.top
+    }
+
+    pub fn pad_left_position(&self) -> u32 {
+        self.pad.left
+    }
+
+    pub fn pad_width(&self) -> u32 {
+        PAD_WIDTH
+    }
+
+    pub fn pad_height(&self) -> u32 {
+        PAD_HEIGHT
     }
 
     pub fn move_pad(&mut self, right: bool) {
@@ -170,20 +187,17 @@ impl Cell {
 }
 
 struct Pad {
-    x: u32,
+    top: u32,
+    left: u32,
 }
 
 impl Pad {
-    fn position(&self) -> u32 {
-        self.x
-    }
-
     fn move_left(&mut self) {
-        self.x = self.x - 30
+        self.left = self.left - 30
     }
 
     fn move_right(&mut self) {
-        self.x = self.x + 30
+        self.left = self.left + 30
     }
 }
 
