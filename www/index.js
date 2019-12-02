@@ -72,12 +72,13 @@ const drawPad = () => {
 };
 
 const drawBall = () => {
-  const xPosition = universe.ball_x_position();
-  const yPosition = universe.ball_y_position();
+  const x = universe.ball_x_position();
+  const y = universe.ball_y_position();
+  const radius = universe.ball_radius();
 
   ctx.beginPath();
   ctx.fillStyle = MAIN_COLOUR;
-  ctx.arc(xPosition, yPosition, 10, 0, Math.PI * 2, true);
+  ctx.arc(x, y, radius, 0, Math.PI * 2, true);
   ctx.fill();
 };
 

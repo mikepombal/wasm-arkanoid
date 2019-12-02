@@ -8,6 +8,10 @@ use wasm_bindgen::prelude::*;
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
+const WIDTH: u32 = 700;
+const HEIGHT: u32 = 800;
+const BALL_RADIUS: u32 = 10;
+
 extern crate js_sys;
 
 #[wasm_bindgen]
@@ -24,7 +28,7 @@ pub struct Universe {
     height: u32,
     cells: Vec<Cell>,
     pad: Pad,
-    ball: Ball
+    ball: Ball,
 }
 
 #[wasm_bindgen]
@@ -84,12 +88,12 @@ impl Universe {
     // }
 
     pub fn new() -> Universe {
-        let width = 700;
-        let height = 800;
+        let width = WIDTH;
+        let height = HEIGHT;
 
         let cells = (0..width * height)
             .map(|_i| {
-                if js_sys::Math::random() < 0.5  {
+                if js_sys::Math::random() < 0.5 {
                     Cell::Alive
                 } else {
                     Cell::Dead
@@ -99,7 +103,11 @@ impl Universe {
 
         let pad = Pad { x: width / 2 };
 
-        let ball = Ball { x: width / 2, y: height / 2 };
+        let ball = Ball {
+            radius: BALL_RADIUS,
+            x: width / 2,
+            y: height / 2,
+        };
 
         Universe {
             width,
@@ -109,10 +117,6 @@ impl Universe {
             ball,
         }
     }
-
-    // pub fn render(&self) -> String {
-    //     self.to_string()
-    // }
 
     pub fn width(&self) -> u32 {
         self.width
@@ -144,13 +148,16 @@ impl Universe {
     }
 
     pub fn ball_x_position(&self) -> u32 {
-        self.ball.x_position()
+        self.ball.x
     }
 
     pub fn ball_y_position(&self) -> u32 {
-        self.ball.y_position()
+        self.ball.y
     }
 
+    pub fn ball_radius(&self) -> u32 {
+        self.ball.radius
+    }
 }
 
 impl Cell {
@@ -163,7 +170,7 @@ impl Cell {
 }
 
 struct Pad {
-    x: u32
+    x: u32,
 }
 
 impl Pad {
@@ -181,17 +188,17 @@ impl Pad {
 }
 
 struct Ball {
+    radius: u32,
     x: u32,
-    y: u32
+    y: u32,
 }
 
-impl Ball {
-    fn x_position(&self) -> u32 {
-        self.x
-    }
+// impl Ball {
+//     fn x_position(&self) -> u32 {
+//         self.x
+//     }
 
-    fn y_position(&self) -> u32 {
-        self.y
-    }
-
-}
+//     fn y_position(&self) -> u32 {
+//         self.y
+//     }
+// }
