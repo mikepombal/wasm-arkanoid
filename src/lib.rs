@@ -11,6 +11,7 @@ static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 const WIDTH: u32 = 700;
 const HEIGHT: u32 = 800;
 const BALL_RADIUS: u32 = 10;
+const BALL_SPEED: u32 = 4;
 const PAD_WIDTH: u32 = 100;
 const PAD_HEIGHT: u32 = 20;
 
@@ -36,6 +37,7 @@ pub struct Universe {
 #[wasm_bindgen]
 impl Universe {
     pub fn tick(&mut self) {
+        self.ball.tick(self.pad.left);
         // let mut next = self.cells.clone();
 
         // for row in 0..self.height {
@@ -111,7 +113,10 @@ impl Universe {
         let ball = Ball {
             radius: BALL_RADIUS,
             x: WIDTH / 2,
-            y: HEIGHT / 2,
+            y: HEIGHT - 2 * PAD_HEIGHT - BALL_RADIUS,
+            speed: BALL_SPEED,
+            direction_right: true,
+            direction_up: true,
         };
 
         Universe {
@@ -196,7 +201,7 @@ impl Pad {
         if self.left < 30 {
             self.left = 0
         } else {
-            self.left = self.left - 30
+            self.left -= 30
         }
     }
 
@@ -204,7 +209,7 @@ impl Pad {
         if self.left >= WIDTH - PAD_WIDTH {
             self.left = WIDTH - PAD_WIDTH
         } else {
-            self.left = self.left + 30
+            self.left += 30
         }
     }
 }
@@ -213,14 +218,39 @@ struct Ball {
     radius: u32,
     x: u32,
     y: u32,
+    speed: u32,
+    direction_up: bool,
+    direction_right: bool,
 }
 
-// impl Ball {
-//     fn x_position(&self) -> u32 {
-//         self.x
-//     }
-
-//     fn y_position(&self) -> u32 {
-//         self.y
-//     }
-// }
+impl Ball {
+    fn tick(&mut self, left_pad: u32) {
+        if self.direction_right {
+            self.x += self.speed;
+        } else {
+            self.x -= self.speed;
+        }
+        if self.direction_up {
+            self.y -= self.speed;
+        } else {
+            self.y += self.speed;
+        }
+        if self.x >= WIDTH - self.radius {
+            self.direction_right = false
+        }
+        if self.x <= self.radius {
+            self.direction_right = true
+        }
+        if self.y <= self.radius {
+            self.direction_up = false
+        }
+        if self.y >= HEIGHT - 2 * PAD_HEIGHT - self.radius
+            && self.x > left_pad
+            && self.x < left_pad + PAD_WIDTH
+        {
+            self.direction_up = true
+        } else if self.y >= HEIGHT - self.radius {
+            self.speed = 0
+        }
+    }
+}
