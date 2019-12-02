@@ -193,11 +193,19 @@ struct Pad {
 
 impl Pad {
     fn move_left(&mut self) {
-        self.left = self.left - 30
+        if self.left < 30 {
+            self.left = 0
+        } else {
+            self.left = self.left - 30
+        }
     }
 
     fn move_right(&mut self) {
-        self.left = self.left + 30
+        if self.left >= WIDTH - PAD_WIDTH {
+            self.left = WIDTH - PAD_WIDTH
+        } else {
+            self.left = self.left + 30
+        }
     }
 }
 
