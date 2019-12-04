@@ -1,4 +1,4 @@
-import { Universe, Cell, Brick } from "wasm";
+import { Universe, Brick } from "wasm";
 import { memory, universe_pad_height } from "wasm/wasm_bg";
 
 const GRID_COLOR = "#CCCCCC";
@@ -19,23 +19,6 @@ const height = universe.height();
 const canvas = document.getElementById("game");
 canvas.height = height;
 canvas.width = width;
-
-// canvas.addEventListener("click", event => {
-//   const boundingRect = canvas.getBoundingClientRect();
-
-//   const scaleX = canvas.width / boundingRect.width;
-//   const scaleY = canvas.height / boundingRect.height;
-
-//   const canvasLeft = (event.clientX - boundingRect.left) * scaleX;
-//   const canvasTop = (event.clientY - boundingRect.top) * scaleY;
-
-//   const row = Math.min(Math.floor(canvasTop / (CELL_SIZE + 1)), height - 1);
-//   const col = Math.min(Math.floor(canvasLeft / (CELL_SIZE + 1)), width - 1);
-
-//   universe.toggle_cell(row, col);
-
-//   // drawCells();
-// });
 
 document.addEventListener(
   "keypress",
@@ -85,30 +68,6 @@ const drawBall = () => {
   ctx.fill();
 };
 
-const drawCells = () => {
-  const cellsPtr = universe.cells();
-  const cells = new Uint8Array(memory.buffer, cellsPtr, width * height);
-
-  ctx.beginPath();
-
-  for (let row = 0; row < height; row++) {
-    for (let col = 0; col < width; col++) {
-      const idx = getIndex(row, col);
-
-      ctx.fillStyle = cells[idx] === Cell.Dead ? DEAD_COLOR : ALIVE_COLOR;
-
-      ctx.fillRect(
-        col * (CELL_SIZE + 1) + 1,
-        row * (CELL_SIZE + 1) + 1,
-        CELL_SIZE,
-        CELL_SIZE
-      );
-    }
-  }
-
-  ctx.stroke();
-};
-
 const drawBricks = () => {
   const rowCount = universe.row_count();
   const colCount = universe.column_count();
@@ -121,7 +80,7 @@ const drawBricks = () => {
   ctx.fillStyle = MAIN_COLOUR;
   for (let row = 0; row < rowCount; row++) {
     for (let col = 0; col < colCount; col++) {
-      if (bricks[row * colCount + col] === Cell.Alive) {
+      if (bricks[row * colCount + col] === Brick.Alive) {
         ctx.fillRect(
           50 + 1 + width * col,
           100 + 1 + height * row,
@@ -145,7 +104,6 @@ const renderLoop = () => {
   drawPad();
   drawBall();
   drawBricks();
-  // drawCells();
 
   universe.tick();
 

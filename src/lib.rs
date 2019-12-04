@@ -24,7 +24,7 @@ extern crate js_sys;
 #[wasm_bindgen]
 #[repr(u8)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum Cell {
+pub enum Brick {
     Dead = 0,
     Alive = 1,
 }
@@ -33,7 +33,7 @@ pub enum Cell {
 pub struct Universe {
     width: u32,
     height: u32,
-    bricks: Vec<Cell>,
+    bricks: Vec<Brick>,
     pad: Pad,
     ball: Ball,
 }
@@ -99,7 +99,9 @@ impl Universe {
         let width = WIDTH;
         let height = HEIGHT;
 
-        let bricks = (0..COLUMN_COUNT * ROW_COUNT).map(|_i| Cell::Dead).collect();
+        let bricks = (0..COLUMN_COUNT * ROW_COUNT)
+            .map(|_i| Brick::Alive)
+            .collect();
 
         let pad = Pad {
             left: WIDTH / 2 - PAD_WIDTH / 2,
@@ -156,7 +158,7 @@ impl Universe {
         }
     }
 
-    pub fn bricks(&self) -> *const Cell {
+    pub fn bricks(&self) -> *const Brick {
         self.bricks.as_ptr()
     }
 
