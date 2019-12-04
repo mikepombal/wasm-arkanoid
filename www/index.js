@@ -1,4 +1,4 @@
-import { Universe, Cell } from "wasm";
+import { Universe, Cell, Brick } from "wasm";
 import { memory, universe_pad_height } from "wasm/wasm_bg";
 
 const GRID_COLOR = "#CCCCCC";
@@ -109,6 +109,31 @@ const drawCells = () => {
   ctx.stroke();
 };
 
+const drawBricks = () => {
+  const rowCount = universe.row_count();
+  const colCount = universe.column_count();
+  const width = universe.brick_width();
+  const height = universe.brick_height();
+  const bricksPtr = universe.bricks();
+  const bricks = new Uint8Array(memory.buffer, bricksPtr, rowCount * colCount);
+
+  ctx.beginPath();
+  ctx.fillStyle = MAIN_COLOUR;
+  for (let row = 0; row < rowCount; row++) {
+    for (let col = 0; col < colCount; col++) {
+      if (bricks[row * colCount + col] === Cell.Alive) {
+        ctx.fillRect(
+          50 + 1 + width * col,
+          100 + 1 + height * row,
+          width - 2,
+          height - 2
+        );
+      }
+    }
+  }
+  ctx.stroke();
+};
+
 let animationId = null;
 
 const isPaused = () => {
@@ -119,6 +144,7 @@ const renderLoop = () => {
   clearPanel();
   drawPad();
   drawBall();
+  drawBricks();
   // drawCells();
 
   universe.tick();

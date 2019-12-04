@@ -14,6 +14,10 @@ const BALL_RADIUS: u32 = 10;
 const BALL_SPEED: u32 = 4;
 const PAD_WIDTH: u32 = 100;
 const PAD_HEIGHT: u32 = 20;
+const ROW_COUNT: u32 = 7;
+const COLUMN_COUNT: u32 = 12;
+const BRICK_HEIGHT: u32 = 30;
+const BRICK_WIDTH: u32 = 50;
 
 extern crate js_sys;
 
@@ -29,7 +33,7 @@ pub enum Cell {
 pub struct Universe {
     width: u32,
     height: u32,
-    cells: Vec<Cell>,
+    bricks: Vec<Cell>,
     pad: Pad,
     ball: Ball,
 }
@@ -70,9 +74,9 @@ impl Universe {
         // self.cells = next;
     }
 
-    fn get_index(&self, row: u32, column: u32) -> usize {
-        (row * self.width + column) as usize
-    }
+    // fn get_index(&self, row: u32, column: u32) -> usize {
+    //     (row * self.width + column) as usize
+    // }
 
     // fn live_neighbor_count(&self, row: u32, column: u32) -> u8 {
     //     let mut count = 0;
@@ -95,15 +99,7 @@ impl Universe {
         let width = WIDTH;
         let height = HEIGHT;
 
-        let cells = (0..WIDTH * HEIGHT)
-            .map(|_i| {
-                if js_sys::Math::random() < 0.5 {
-                    Cell::Alive
-                } else {
-                    Cell::Dead
-                }
-            })
-            .collect();
+        let bricks = (0..COLUMN_COUNT * ROW_COUNT).map(|_i| Cell::Dead).collect();
 
         let pad = Pad {
             left: WIDTH / 2 - PAD_WIDTH / 2,
@@ -122,7 +118,7 @@ impl Universe {
         Universe {
             width,
             height,
-            cells,
+            bricks,
             pad,
             ball,
         }
@@ -160,14 +156,38 @@ impl Universe {
         }
     }
 
-    pub fn cells(&self) -> *const Cell {
-        self.cells.as_ptr()
+    pub fn bricks(&self) -> *const Cell {
+        self.bricks.as_ptr()
     }
 
-    pub fn toggle_cell(&mut self, row: u32, column: u32) {
-        let idx = self.get_index(row, column);
-        self.cells[idx].toggle();
+    pub fn bricks_count(&self) -> usize {
+        self.bricks.len()
     }
+
+    pub fn row_count(&self) -> u32 {
+        ROW_COUNT
+    }
+
+    pub fn column_count(&self) -> u32 {
+        COLUMN_COUNT
+    }
+
+    pub fn brick_height(&self) -> u32 {
+        BRICK_HEIGHT
+    }
+
+    pub fn brick_width(&self) -> u32 {
+        BRICK_WIDTH
+    }
+
+    // pub fn cells(&self) -> *const Cell {
+    //     self.cells.as_ptr()
+    // }
+
+    // pub fn toggle_cell(&mut self, row: u32, column: u32) {
+    //     let idx = self.get_index(row, column);
+    //     self.cells[idx].toggle();
+    // }
 
     pub fn ball_x_position(&self) -> u32 {
         self.ball.x
@@ -179,15 +199,6 @@ impl Universe {
 
     pub fn ball_radius(&self) -> u32 {
         self.ball.radius
-    }
-}
-
-impl Cell {
-    fn toggle(&mut self) {
-        *self = match *self {
-            Cell::Dead => Cell::Alive,
-            Cell::Alive => Cell::Dead,
-        };
     }
 }
 
