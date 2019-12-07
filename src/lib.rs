@@ -40,6 +40,11 @@ pub struct Universe {
     ball: Ball,
 }
 
+struct Target {
+    x: u32,
+    y: u32,
+}
+
 #[wasm_bindgen]
 extern "C" {
     // Use `js_namespace` here to bind `console.log(..)` instead of just
@@ -61,7 +66,73 @@ extern "C" {
 #[wasm_bindgen]
 impl Universe {
     pub fn tick(&mut self) {
-        self.ball.tick(self.pad.left);
+        // self.ball.tick(self.pad.left);
+
+        for _step in 0..self.ball.speed {
+            let target = match (self.ball.direction_right, self.ball.direction_up) {
+                (true, true) => Target {
+                    x: self.ball.x + 1,
+                    y: self.ball.y - 1,
+                },
+                (true, false) => Target {
+                    x: self.ball.x + 1,
+                    y: self.ball.y + 1,
+                },
+                (false, true) => Target {
+                    x: self.ball.x - 1,
+                    y: self.ball.y - 1,
+                },
+                (false, false) => Target {
+                    x: self.ball.x - 1,
+                    y: self.ball.y + 1,
+                },
+            };
+
+            for index in 0..COLUMN_COUNT * ROW_COUNT {
+                let brick = self.bricks[index as usize];
+                if brick == Brick::Alive && self.check_brick_colision(target.x, target.y, index) {
+                    // log("Yes!!!")
+                    self.bricks[index as usize] = Brick::Dead;
+                }
+            }
+
+            if self.ball.direction_right {
+                if target.x > WIDTH - self.ball.radius {
+                    self.ball.direction_right = false
+                } else {
+                    self.ball.x += 1;
+                }
+            } else {
+                self.ball.x -= 1;
+            }
+            if self.ball.direction_up {
+                if target.y < self.ball.radius {
+                    self.ball.direction_up = false
+                } else {
+                    self.ball.y -= 1;
+                }
+            } else {
+                self.ball.y += 1;
+            }
+            if self.ball.x >= WIDTH - self.ball.radius {
+                self.ball.direction_right = false
+            }
+            if self.ball.x <= self.ball.radius {
+                self.ball.direction_right = true
+            }
+            if self.ball.y <= self.ball.radius {
+                self.ball.direction_up = false
+            }
+            if self.ball.y >= HEIGHT - 2 * PAD_HEIGHT - self.ball.radius
+                && self.ball.x > self.pad.left
+                && self.ball.x < self.pad.left + PAD_WIDTH
+            {
+                self.ball.direction_up = true
+            } else if self.ball.y >= HEIGHT - self.ball.radius {
+                self.ball.speed = 0
+            }
+        }
+
         // let mut next = self.cells.clone();
 
         // for row in 0..self.height {
@@ -92,6 +163,19 @@ impl Universe {
         // }
 
         // self.cells = next;
+    }
+
+    fn check_brick_colision(&self, ball_x: u32, ball_y: u32, index: u32) -> bool {
+        let brick_x = MARGIN_WIDTH + (index % COLUMN_COUNT) * BRICK_WIDTH;
+        let brick_y = MARGIN_HEIGHT + (index / COLUMN_COUNT) * BRICK_HEIGHT;
+        if ball_x > brick_x
+            && ball_x < brick_x + BRICK_WIDTH
+            && ball_y > brick_y
+            && ball_y < brick_y + BRICK_HEIGHT
+        {
+            return true;
+        }
+        false
     }
 
     // fn get_index(&self, row: u32, column: u32) -> usize {
@@ -258,36 +342,4 @@ struct Ball {
     speed: u32,
     direction_up: bool,
     direction_right: bool,
-}
-
-impl Ball {
-    fn tick(&mut self, left_pad: u32) {
-        if self.direction_right {
-            self.x += self.speed;
-        } else {
-            self.x -= self.speed;
-        }
-        if self.direction_up {
-            self.y -= self.speed;
-        } else {
-            self.y += self.speed;
-        }
-        if self.x >= WIDTH - self.radius {
-            self.direction_right = false
-        }
-        if self.x <= self.radius {
-            self.direction_right = true
-        }
-        if self.y <= self.radius {
-            self.direction_up = false
-        }
-        if self.y >= HEIGHT - 2 * PAD_HEIGHT - self.radius
-            && self.x > left_pad
-            && self.x < left_pad + PAD_WIDTH
-        {
-            self.direction_up = true
-        } else if self.y >= HEIGHT - self.radius {
-            self.speed = 0
-        }
-    }
 }
