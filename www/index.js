@@ -74,6 +74,8 @@ const drawBricks = () => {
   const width = universe.brick_width();
   const height = universe.brick_height();
   const bricksPtr = universe.bricks();
+  const marginHeight = universe.margin_height();
+  const marginWidth = universe.margin_width();
   const bricks = new Uint8Array(memory.buffer, bricksPtr, rowCount * colCount);
 
   ctx.beginPath();
@@ -82,8 +84,8 @@ const drawBricks = () => {
     for (let col = 0; col < colCount; col++) {
       if (bricks[row * colCount + col] === Brick.Alive) {
         ctx.fillRect(
-          50 + 1 + width * col,
-          100 + 1 + height * row,
+          marginWidth + 1 + width * col,
+          marginHeight + 1 + height * row,
           width - 2,
           height - 2
         );

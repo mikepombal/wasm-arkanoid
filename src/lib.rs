@@ -18,6 +18,8 @@ const ROW_COUNT: u32 = 7;
 const COLUMN_COUNT: u32 = 12;
 const BRICK_HEIGHT: u32 = 30;
 const BRICK_WIDTH: u32 = 50;
+const MARGIN_HEIGHT: u32 = 100;
+const MARGIN_WIDTH: u32 = 50;
 
 extern crate js_sys;
 
@@ -200,9 +202,13 @@ impl Universe {
         BRICK_WIDTH
     }
 
-    // pub fn cells(&self) -> *const Cell {
-    //     self.cells.as_ptr()
-    // }
+    pub fn margin_height(&self) -> u32 {
+        MARGIN_HEIGHT
+    }
+
+    pub fn margin_width(&self) -> u32 {
+        MARGIN_WIDTH
+    }
 
     // pub fn toggle_cell(&mut self, row: u32, column: u32) {
     //     let idx = self.get_index(row, column);
