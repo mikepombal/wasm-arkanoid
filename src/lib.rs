@@ -66,8 +66,6 @@ extern "C" {
 #[wasm_bindgen]
 impl Universe {
     pub fn tick(&mut self) {
-        // self.ball.tick(self.pad.left);
-
         for _step in 0..self.ball.speed {
             let target = match (self.ball.direction_right, self.ball.direction_up) {
                 (true, true) => Target {
@@ -91,7 +89,6 @@ impl Universe {
             for index in 0..COLUMN_COUNT * ROW_COUNT {
                 let brick = self.bricks[index as usize];
                 if brick == Brick::Alive && self.check_brick_colision(target.x, target.y, index) {
-                    // log("Yes!!!")
                     self.bricks[index as usize] = Brick::Dead;
                 }
             }
@@ -168,11 +165,28 @@ impl Universe {
     fn check_brick_colision(&self, ball_x: u32, ball_y: u32, index: u32) -> bool {
         let brick_x = MARGIN_WIDTH + (index % COLUMN_COUNT) * BRICK_WIDTH;
         let brick_y = MARGIN_HEIGHT + (index / COLUMN_COUNT) * BRICK_HEIGHT;
-        if ball_x > brick_x
-            && ball_x < brick_x + BRICK_WIDTH
-            && ball_y > brick_y
-            && ball_y < brick_y + BRICK_HEIGHT
-        {
+        // temporary variables to set edges for testing
+        let mut test_x = ball_x;
+        let mut test_y = ball_y;
+
+        // which edge is closest?
+        if ball_x < brick_x {
+            test_x = brick_x // left edge
+        } else if ball_x > brick_x + BRICK_WIDTH {
+            test_x = brick_x + BRICK_WIDTH // right edge
+        }
+        if ball_y < brick_y {
+            test_y = brick_y
+        } else if ball_y > brick_y + BRICK_HEIGHT {
+            test_y = brick_y + BRICK_HEIGHT
+        }
+
+        // get distance from closest edges
+        let dist_x = std::cmp::max(ball_x, test_x) - std::cmp::min(ball_x, test_x);
+        let dist_y = std::cmp::max(ball_y, test_y) - std::cmp::min(ball_y, test_y);
+        let distance = ((dist_x ^ 2) + (dist_y ^ 2)) ^ (1 / 2);
+
+        if distance < BALL_RADIUS {
             return true;
         }
         false
