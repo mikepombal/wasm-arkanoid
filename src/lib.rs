@@ -96,9 +96,18 @@ impl Universe {
 
             for index in 0..COLUMN_COUNT * ROW_COUNT {
                 let brick = self.bricks[index as usize];
-                if brick == Brick::Alive && self.check_brick_colision(target.x, target.y, index) > 0
-                {
-                    self.bricks[index as usize] = Brick::Dead;
+                if brick == Brick::Alive {
+                    let colision_type = self.check_brick_colision(target.x, target.y, index);
+                    if colision_type > 0 {
+                        self.bricks[index as usize] = Brick::Dead;
+                        match colision_type {
+                            1 => self.ball.direction_up = true,
+                            2 => self.ball.direction_right = true,
+                            3 => self.ball.direction_up = false,
+                            4 => self.ball.direction_right = false,
+                            _ => (),
+                        }
+                    }
                 }
             }
 
