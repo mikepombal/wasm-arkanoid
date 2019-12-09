@@ -384,6 +384,10 @@ impl Universe {
     pub fn ball_radius(&self) -> u32 {
         self.ball.radius
     }
+
+    pub fn get_status(&self) -> GameStatus {
+        self.status
+    }
 }
 
 struct Pad {

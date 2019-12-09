@@ -1,4 +1,4 @@
-import { Universe, Brick } from "wasm";
+import { Universe, Brick, GameStatus } from "wasm";
 import { memory, universe_pad_height } from "wasm/wasm_bg";
 
 const GRID_COLOR = "#CCCCCC";
@@ -104,6 +104,12 @@ const isPaused = () => {
 };
 
 const renderLoop = () => {
+  const gameStatus = universe.get_status();
+  if (gameStatus === GameStatus.Lost) {
+    const overlay = document.getElementById("overlay");
+    overlay.style.visibility = "visible";
+  }
+
   clearPanel();
   drawPad();
   drawBall();
