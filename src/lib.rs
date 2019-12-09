@@ -32,6 +32,15 @@ pub enum Brick {
 }
 
 #[wasm_bindgen]
+#[repr(u8)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum GameStatus {
+    Start = 0,
+    Playing = 1,
+    Lost = 2,
+}
+
+#[wasm_bindgen]
 pub struct Universe {
     width: u32,
     height: u32,
@@ -52,12 +61,6 @@ enum BrickColision {
     Right = 2,
     Bottom = 3,
     Left = 4,
-}
-
-enum GameStatus {
-    Start = 0,
-    Playing,
-    Lost,
 }
 
 #[wasm_bindgen]
