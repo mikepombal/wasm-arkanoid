@@ -105,9 +105,12 @@ const isPaused = () => {
 
 const renderLoop = () => {
   const gameStatus = universe.get_status();
-  if (gameStatus === GameStatus.Lost) {
+  if (gameStatus === GameStatus.Lost || gameStatus === GameStatus.Won) {
     const overlay = document.getElementById("overlay");
     overlay.style.visibility = "visible";
+    const header = document.getElementById("header");
+    header.textContent =
+      gameStatus === GameStatus.Lost ? "Loser!!!" : "Winner!!!";
   }
 
   clearPanel();

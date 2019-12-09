@@ -38,6 +38,7 @@ pub enum GameStatus {
     Start = 0,
     Playing = 1,
     Lost = 2,
+    Won = 3,
 }
 
 #[wasm_bindgen]
@@ -111,6 +112,7 @@ impl Universe {
                 },
             };
 
+            let mut count = 0;
             for index in 0..COLUMN_COUNT * ROW_COUNT {
                 let brick = self.bricks[index as usize];
                 if brick == Brick::Alive {
@@ -124,8 +126,14 @@ impl Universe {
                             4 => self.ball.direction_right = false,
                             _ => (),
                         }
+                    } else {
+                        count += 1
                     }
                 }
+            }
+            if count == 0 {
+                self.status = GameStatus::Won;
+                return;
             }
 
             if self.ball.direction_right {
