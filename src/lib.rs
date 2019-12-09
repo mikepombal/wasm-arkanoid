@@ -45,6 +45,14 @@ struct Target {
     y: u32,
 }
 
+enum BrickColision {
+    No = 0,
+    Top = 1,
+    Right = 2,
+    Bottom = 3,
+    Left = 4,
+}
+
 #[wasm_bindgen]
 extern "C" {
     // Use `js_namespace` here to bind `console.log(..)` instead of just
@@ -88,7 +96,8 @@ impl Universe {
 
             for index in 0..COLUMN_COUNT * ROW_COUNT {
                 let brick = self.bricks[index as usize];
-                if brick == Brick::Alive && self.check_brick_colision(target.x, target.y, index) {
+                if brick == Brick::Alive && self.check_brick_colision(target.x, target.y, index) > 0
+                {
                     self.bricks[index as usize] = Brick::Dead;
                 }
             }
@@ -162,7 +171,7 @@ impl Universe {
         // self.cells = next;
     }
 
-    fn check_brick_colision(&self, ball_x: u32, ball_y: u32, index: u32) -> bool {
+    fn check_brick_colision(&self, ball_x: u32, ball_y: u32, index: u32) -> u8 {
         let brick_x = MARGIN_WIDTH + (index % COLUMN_COUNT) * BRICK_WIDTH;
         let brick_y = MARGIN_HEIGHT + (index / COLUMN_COUNT) * BRICK_HEIGHT;
         // temporary variables to set edges for testing
@@ -187,9 +196,20 @@ impl Universe {
         let distance = ((dist_x ^ 2) + (dist_y ^ 2)) ^ (1 / 2);
 
         if distance < BALL_RADIUS {
-            return true;
+            if dist_x > dist_y {
+                if ball_x > test_x {
+                    return BrickColision::Right as u8;
+                } else if ball_x < test_x {
+                    return BrickColision::Left as u8;
+                }
+            }
+            if ball_y > test_y {
+                return BrickColision::Bottom as u8;
+            } else if ball_y < test_y {
+                return BrickColision::Top as u8;
+            }
         }
-        false
+        BrickColision::No as u8
     }
 
     // fn get_index(&self, row: u32, column: u32) -> usize {
