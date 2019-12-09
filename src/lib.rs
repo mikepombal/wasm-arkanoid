@@ -56,7 +56,8 @@ enum BrickColision {
 
 enum GameStatus {
     Start = 0,
-    Playing = 1,
+    Playing,
+    Lost,
 }
 
 #[wasm_bindgen]
@@ -81,10 +82,10 @@ extern "C" {
 impl Universe {
     pub fn tick(&mut self) {
         match self.status {
-            GameStatus::Start => {
+            GameStatus::Playing => (),
+            _ => {
                 return;
             }
-            _ => (),
         }
 
         for _step in 0..self.ball.speed {
@@ -157,7 +158,7 @@ impl Universe {
             {
                 self.ball.direction_up = true
             } else if self.ball.y >= HEIGHT - self.ball.radius {
-                self.ball.speed = 0
+                self.status = GameStatus::Lost
             }
         }
 
