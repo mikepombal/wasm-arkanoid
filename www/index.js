@@ -27,6 +27,8 @@ document.addEventListener(
       universe.move_pad(false);
     } else if (event.key === "l") {
       universe.move_pad(true);
+    } else if (event.key === "k") {
+      universe.start_ball();
     }
   },
   false

@@ -38,6 +38,7 @@ pub struct Universe {
     bricks: Vec<Brick>,
     pad: Pad,
     ball: Ball,
+    status: GameStatus,
 }
 
 struct Target {
@@ -51,6 +52,11 @@ enum BrickColision {
     Right = 2,
     Bottom = 3,
     Left = 4,
+}
+
+enum GameStatus {
+    Start = 0,
+    Playing = 1,
 }
 
 #[wasm_bindgen]
@@ -74,6 +80,13 @@ extern "C" {
 #[wasm_bindgen]
 impl Universe {
     pub fn tick(&mut self) {
+        match self.status {
+            GameStatus::Start => {
+                return;
+            }
+            _ => (),
+        }
+
         for _step in 0..self.ball.speed {
             let target = match (self.ball.direction_right, self.ball.direction_up) {
                 (true, true) => Target {
@@ -264,12 +277,15 @@ impl Universe {
             direction_up: true,
         };
 
+        let status = GameStatus::Start;
+
         Universe {
             width,
             height,
             bricks,
             pad,
             ball,
+            status,
         }
     }
 
@@ -298,11 +314,22 @@ impl Universe {
     }
 
     pub fn move_pad(&mut self, right: bool) {
-        if right {
-            self.pad.move_right()
-        } else {
-            self.pad.move_left()
+        match self.status {
+            GameStatus::Playing => {
+                if right {
+                    self.pad.move_right()
+                } else {
+                    self.pad.move_left()
+                }
+            }
+            _ => {
+                return;
+            }
         }
+    }
+
+    pub fn start_ball(&mut self) {
+        self.status = GameStatus::Playing
     }
 
     pub fn bricks(&self) -> *const Brick {
