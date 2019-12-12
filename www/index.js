@@ -43,7 +43,7 @@ const getBricksData = () => {
 const getGameStatus = () => universe.get_status();
 
 const tick = () => {
-  universe.tick();
+  universe.tick(Math.random());
 };
 
 init({

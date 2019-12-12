@@ -48,7 +48,6 @@ export const init = ({
 
   const drawPad = () => {
     const { top, left, height, width } = getPadPosition();
-
     ctx.beginPath();
     ctx.fillStyle = MAIN_COLOUR;
     ctx.fillRect(left, top, width, height);
@@ -57,7 +56,6 @@ export const init = ({
 
   const drawBall = () => {
     const { x, y, radius } = getBallPosition();
-
     ctx.beginPath();
     ctx.fillStyle = MAIN_COLOUR;
     ctx.arc(x, y, radius, 0, Math.PI * 2, true);
@@ -70,12 +68,10 @@ export const init = ({
       colCount,
       width,
       height,
-      bricksPtr,
       marginHeight,
       marginWidth,
       bricks
     } = getBricksData();
-
     ctx.beginPath();
     ctx.fillStyle = MAIN_COLOUR;
     for (let row = 0; row < rowCount; row++) {

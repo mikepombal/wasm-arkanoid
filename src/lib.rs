@@ -84,13 +84,22 @@ extern "C" {
 
 #[wasm_bindgen]
 impl Universe {
-    pub fn tick(&mut self) {
+    pub fn tick(&mut self, rand: f32) {
         match self.status {
             GameStatus::Playing => (),
             _ => {
                 return;
             }
         }
+        let mut dummy: f32 = 1.0;
+        for j in 0..100_000_000 as i32 {
+            if j % 2 == 0 {
+                dummy = dummy * rand;
+            } else {
+                dummy = dummy / rand;
+            }
+        }
+        // log(&dummy.to_string());
 
         for _step in 0..self.ball.speed {
             let target = match (self.ball.direction_right, self.ball.direction_up) {
